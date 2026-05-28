@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToonTrade – Gaming P2P Marketplace</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d14;--surface:#16161f;--surface2:#1e1e2a;--border:#2a2a3a;--accent:#7c6cfa;--accent2:#fa6c9f;--accent3:#6cfabc;--accent4:#fac96c;--text:#f0f0ff;--text2:#8888aa;--stripe:#635bff;--glow:rgba(124,108,250,0.3);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+h1,h2,h3,h4{font-family:'Inter',sans-serif;}
+.page{display:none;}
+.page.active{display:block;}
+.glass{background:rgba(22,22,31,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;transition:all 0.2s;}
+.card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 40px var(--glow);}
+.btn-p{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-family:'Inter',sans-serif;font-weight:700;cursor:pointer;transition:all 0.2s;font-size:14px;}
+.btn-p:hover{background:#9b8dff;box-shadow:0 4px 20px var(--glow);transform:translateY(-1px);}
+.btn-s{background:transparent;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:14px;}
+.btn-s:hover{border-color:var(--accent);color:var(--accent);}
+.btn-stripe{background:var(--stripe);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-family:'Inter',sans-serif;font-weight:700;cursor:pointer;transition:all 0.2s;font-size:15px;display:flex;align-items:center;gap:8px;justify-content:center;}
+.btn-stripe:hover{background:#7a73ff;box-shadow:0 4px 20px rgba(99,91,255,0.4);transform:translateY(-1px);}
+.btn-danger{background:rgba(250,108,108,0.12);color:#fa6c6c;border:1px solid rgba(250,108,108,0.25);border-radius:10px;padding:10px 20px;font-family:'Inter',sans-serif;font-weight:700;cursor:pointer;transition:all 0.2s;font-size:14px;}
+.btn-danger:hover{background:rgba(250,108,108,0.22);}
+.btn-success{background:rgba(108,250,188,0.12);color:var(--accent3);border:1px solid rgba(108,250,188,0.25);border-radius:10px;padding:10px 20px;font-family:'Inter',sans-serif;font-weight:700;cursor:pointer;transition:all 0.2s;font-size:14px;}
+.btn-success:hover{background:rgba(108,250,188,0.22);}
+.inp{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;width:100%;outline:none;transition:border-color 0.2s;}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);}
+.inp::placeholder{color:var(--text2);}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;}
+.nl{color:var(--text2);font-weight:600;font-size:14px;padding:8px 14px;border-radius:8px;cursor:pointer;border:none;background:transparent;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.nl:hover,.nl.active{color:var(--text);background:var(--surface2);}
+.nl.active{color:var(--accent);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.fu{animation:fadeUp 0.38s ease forwards;}
+.hero-grid{background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;}
+.stat-c{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.bdot{width:8px;height:8px;border-radius:50%;background:var(--accent3);display:inline-block;box-shadow:0 0 6px var(--accent3);}
+.sh{scrollbar-width:none;}
+.sh::-webkit-scrollbar{display:none;}
+.cm-u{background:var(--accent);border-radius:16px 16px 4px 16px;padding:10px 14px;font-size:13px;max-width:75%;margin-left:auto;}
+.cm-b{background:var(--surface2);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:10px 14px;font-size:13px;max-width:75%;}
+.cp{background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:8px 18px;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.2s;font-family:'Inter',sans-serif;color:var(--text2);white-space:nowrap;}
+.cp:hover,.cp.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(7px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.mo.open{opacity:1;pointer-events:all;}
+.mb{background:var(--surface);border:1px solid var(--border);border-radius:20px;max-width:520px;width:95%;max-height:90vh;overflow-y:auto;transform:scale(0.95);transition:transform 0.25s;}
+.mo.open .mb{transform:scale(1);}
+.ts{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);margin-bottom:8px;}
+.sn{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;font-family:'Inter',sans-serif;}
+.sn.done{background:var(--accent3);color:var(--bg);}
+.sn.pend{background:var(--surface);border:1px solid var(--border);color:var(--text2);}
+.rc{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.pb{height:6px;border-radius:3px;background:var(--border);overflow:hidden;}
+.pf{height:100%;border-radius:3px;background:var(--accent4);}
+.hbadge{background:rgba(124,108,250,0.12);border:1px solid rgba(124,108,250,0.28);color:var(--accent);border-radius:999px;padding:4px 14px;font-size:12px;font-weight:700;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px;}
+.ndot{width:7px;height:7px;border-radius:50%;background:var(--accent2);position:absolute;top:5px;right:5px;}
+select.inp option{background:var(--surface);}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<nav class="glass sticky top-0 z-50">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;gap:20px;">
+    <button onclick="nav('marketplace')" style="font-family:'Inter',sans-serif;font-size:20px;font-weight:800;color:var(--text);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;flex-shrink:0;">
+      <span style="background:var(--accent);border-radius:8px;padding:4px 8px;font-size:14px;color:#fff;">TT</span>ToonTrade
+    </button>
+    <div style="flex:1;max-width:380px;position:relative;">
+      <input id="si" type="text" placeholder="Skins, Items, Games suchen…" class="inp" style="padding-left:40px;" oninput="doSearch(this.value)">
+      <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text2);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin-left:auto;">
+      <button onclick="nav('marketplace')" id="nav-marketplace" class="nl active">Marktplatz</button>
+      <button onclick="nav('create')" id="nav-create" class="nl">Erstellen</button>
+      <button onclick="nav('dashboard')" id="nav-dashboard" class="nl" style="position:relative;">Dashboard<span id="ndot" class="ndot" style="display:none;"></span></button>
+      <button onclick="nav('reviews')" id="nav-reviews" class="nl">Bewertungen</button>
+      <div style="width:1px;height:24px;background:var(--border);margin:0 8px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);">
+        <span class="bdot"></span>
+        <span style="font-size:13px;font-weight:600;">CrazyJoe99</span>
+        <div style="width:28px;height:28px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;color:#fff;">CJ</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div id="page-marketplace" class="page active fu">
+  <div class="hero-grid" style="padding:80px 24px 64px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(124,108,250,0.14) 0%,transparent 70%);pointer-events:none;"></div>
+    <div style="max-width:1280px;margin:0 auto;text-align:center;position:relative;">
+      <div class="hbadge" style="margin-bottom:20px;"><span class="bdot"></span>2.847 Trader online · Käuferschutz inklusive</div>
+      <h1 style="font-size:clamp(34px,5vw,62px);font-weight:800;line-height:1.1;margin-bottom:16px;">
+        Der Marktplatz für<br>
+        <span style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Gaming Items &amp; Skins</span>
+      </h1>
+      <p style="color:var(--text2);font-size:17px;max-width:480px;margin:0 auto 32px;line-height:1.6;">Handle Items, Währungen und Accounts mit echten Spielern – sicher, schnell und transparent.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-p" onclick="document.getElementById('offers-sec').scrollIntoView({behavior:'smooth'})" style="padding:14px 28px;font-size:15px;">Jetzt stöbern →</button>
+        <button class="btn-s" onclick="nav('create')" style="padding:14px 28px;font-size:15px;">Angebot erstellen</button>
+      </div>
+      <div style="display:flex;gap:48px;justify-content:center;margin-top:52px;flex-wrap:wrap;">
+        <div style="text-align:center;"><div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;">14.200+</div><div style="color:var(--text2);font-size:13px;">Aktive Angebote</div></div>
+        <div style="width:1px;background:var(--border);"></div>
+        <div style="text-align:center;"><div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;">€2.1M+</div><div style="color:var(--text2);font-size:13px;">Handelsvolumen</div></div>
+        <div style="width:1px;background:var(--border);"></div>
+        <div style="text-align:center;"><div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;">4.97 ★</div><div style="color:var(--text2);font-size:13px;">Ø Bewertung</div></div>
+      </div>
+    </div>
+  </div>
+  <div id="offers-sec" style="max-width:1280px;margin:0 auto;padding:0 24px 80px;">
+    <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:16px;margin-bottom:26px;" class="sh">
+      <button class="cp active" data-c="alle" onclick="filterCat('alle',this)">Alle</button>
+      <button class="cp" data-c="skins" onclick="filterCat('skins',this)">🎨 Skins</button>
+      <button class="cp" data-c="währungen" onclick="filterCat('währungen',this)">💰 Währungen</button>
+      <button class="cp" data-c="accounts" onclick="filterCat('accounts',this)">👤 Accounts</button>
+      <button class="cp" data-c="waffen" onclick="filterCat('waffen',this)">⚔️ Waffen</button>
+      <button class="cp" data-c="boosts" onclick="filterCat('boosts',this)">⚡ Boosts</button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div><h2 style="font-size:20px;font-weight:700;" id="olabel">Alle Angebote</h2><p style="color:var(--text2);font-size:13px;margin-top:2px;">Echtzeit aus localStorage-Datenbank</p></div>
+      <select onchange="doSort(this.value)" class="inp" style="width:auto;padding:8px 14px;font-size:13px;">
+        <option value="newest">Neueste</option>
+        <option value="pa">Preis ↑</option>
+        <option value="pd">Preis ↓</option>
+        <option value="rating">Beste Bewertung</option>
+      </select>
+    </div>
+    <div id="offers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;"></div>
+    <div id="no-res" style="display:none;text-align:center;padding:80px 0;"><div style="font-size:48px;margin-bottom:12px;">🔍</div><p style="font-size:18px;font-weight:700;color:var(--text2);">Keine Angebote gefunden</p></div>
+    <div id="pagination" style="display:none;align-items:center;justify-content:center;gap:12px;margin-top:40px;">
+      <button id="pg-prev" onclick="goPage(-1)" style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        ← Zurück
+      </button>
+      <div id="pg-numbers" style="display:flex;gap:6px;"></div>
+      <button id="pg-next" onclick="goPage(1)" style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        Weiter →
+      </button>
+    </div>
+  </div>
+
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px 80px;">
+    <div style="border-top:1px solid var(--border);padding-top:64px;margin-bottom:40px;text-align:center;">
+      <div class="hbadge" style="margin-bottom:16px;">⭐ Kundenbewertungen</div>
+      <h2 style="font-size:28px;font-weight:800;margin-bottom:8px;">Was unsere Trader sagen</h2>
+      <p style="color:var(--text2);font-size:15px;">Über 12.000 verifizierte Bewertungen von echten Nutzern</p>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:36px;display:grid;grid-template-columns:160px 1fr;gap:36px;align-items:center;">
+      <div style="text-align:center;">
+        <div style="font-size:64px;font-weight:800;line-height:1;color:var(--accent4);">4.97</div>
+        <div style="margin:8px 0;font-size:20px;letter-spacing:2px;color:var(--accent4);">★★★★★</div>
+        <div style="color:var(--text2);font-size:12px;">12.483 Bewertungen</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:13px;color:var(--text2);width:32px;flex-shrink:0;">5 ★</span><div class="pb" style="flex:1;"><div class="pf" style="width:91%;"></div></div><span style="font-size:12px;color:var(--text2);width:30px;text-align:right;">91%</span></div>
+        <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:13px;color:var(--text2);width:32px;flex-shrink:0;">4 ★</span><div class="pb" style="flex:1;"><div class="pf" style="width:6%;"></div></div><span style="font-size:12px;color:var(--text2);width:30px;text-align:right;">6%</span></div>
+        <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:13px;color:var(--text2);width:32px;flex-shrink:0;">3 ★</span><div class="pb" style="flex:1;"><div class="pf" style="width:2%;"></div></div><span style="font-size:12px;color:var(--text2);width:30px;text-align:right;">2%</span></div>
+        <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:13px;color:var(--text2);width:32px;flex-shrink:0;">2 ★</span><div class="pb" style="flex:1;"><div class="pf" style="width:1%;"></div></div><span style="font-size:12px;color:var(--text2);width:30px;text-align:right;">1%</span></div>
+        <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:13px;color:var(--text2);width:32px;flex-shrink:0;">1 ★</span><div class="pb" style="flex:1;"><div class="pf" style="width:0.5%;"></div></div><span style="font-size:12px;color:var(--text2);width:30px;text-align:right;">&lt;1%</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;margin-bottom:36px;" id="mkt-rgrid"></div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:28px;">
+      <h3 style="font-size:17px;font-weight:700;margin-bottom:18px;">Bewertung hinterlassen</h3>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div><label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">DEIN NAME</label><input id="mrn" type="text" placeholder="z.B. xX_SnipeKing_Xx" class="inp"></div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">STERNE</label>
+          <div id="mspick" style="display:flex;gap:6px;font-size:26px;cursor:pointer;"></div>
+          <input id="mrs" type="hidden" value="5">
+        </div>
+        <div><label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">BEWERTUNG</label><textarea id="mrt" rows="3" placeholder="Deine Erfahrung…" class="inp" style="resize:vertical;"></textarea></div>
+        <button onclick="submitMktReview(event)" class="btn-p" style="width:100%;padding:12px;">Bewertung abschicken</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-create" class="page fu" style="max-width:640px;margin:0 auto;padding:48px 24px;">
+  <div style="margin-bottom:32px;"><h1 style="font-size:28px;font-weight:800;margin-bottom:6px;">Neues Angebot</h1><p style="color:var(--text2);font-size:14px;">Erstelle ein Angebot – es wird sofort gespeichert und für alle sichtbar.</p></div>
+  <div class="card" style="padding:32px;border-radius:20px;">
+    <div id="c-succ" style="display:none;background:rgba(108,250,188,0.08);border:1px solid rgba(108,250,188,0.25);border-radius:12px;padding:14px;margin-bottom:20px;text-align:center;color:var(--accent3);font-weight:600;font-size:14px;">✓ Angebot gespeichert! Weiterleitung…</div>
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">TITEL *</label>
+        <input id="ft" type="text" placeholder="z.B. Dragon Lore AWP Field-Tested" class="inp">
+        <p id="et" style="display:none;color:#fa6c6c;font-size:12px;margin-top:4px;">Pflichtfeld</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">SPIEL *</label>
+          <select id="fg" class="inp"><option value="">Wählen…</option><option>CS2</option><option>Fortnite</option><option>Rocket League</option><option>Valorant</option><option>Roblox</option><option>Minecraft</option><option>League of Legends</option><option>Diablo IV</option></select>
+          <p id="eg" style="display:none;color:#fa6c6c;font-size:12px;margin-top:4px;">Pflichtfeld</p>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">KATEGORIE *</label>
+          <select id="fc" class="inp"><option value="">Wählen…</option><option value="skins">Skins</option><option value="währungen">Währungen</option><option value="accounts">Accounts</option><option value="waffen">Waffen</option><option value="boosts">Boosts</option></select>
+          <p id="ec" style="display:none;color:#fa6c6c;font-size:12px;margin-top:4px;">Pflichtfeld</p>
+        </div>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">PREIS (€) *</label>
+        <div style="position:relative;"><span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text2);font-weight:600;">€</span><input id="fp" type="number" min="0.01" step="0.01" placeholder="0.00" class="inp" style="padding-left:30px;"></div>
+        <p id="ep" style="display:none;color:#fa6c6c;font-size:12px;margin-top:4px;">Gültigen Preis eingeben</p>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">BESCHREIBUNG</label>
+        <textarea id="fd" rows="4" placeholder="Beschreibe dein Item, Zustand, Besonderheiten…" class="inp" style="resize:vertical;"></textarea>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;font-family:'Inter',sans-serif;">EMOJI</label>
+        <div id="epick" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+        <input id="fe" type="hidden" value="🎮">
+      </div>
+      <div style="background:rgba(108,250,188,0.04);border:1px solid rgba(108,250,188,0.14);border-radius:12px;padding:14px;display:flex;gap:10px;align-items:flex-start;">
+        <svg style="width:16px;height:16px;color:var(--accent3);flex-shrink:0;margin-top:1px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <div style="font-size:12px;color:var(--text2);">Alle Zahlungen laufen über <strong style="color:var(--accent3);">Stripe</strong>. Keine Zahlungsdaten auf unseren Servern.</div>
+      </div>
+      <button onclick="submitOffer()" class="btn-p" style="padding:14px;font-size:15px;width:100%;">Angebot veröffentlichen</button>
+    </div>
+  </div>
+</div>
+
+<div id="page-dashboard" class="page fu" style="max-width:1280px;margin:0 auto;padding:48px 24px;">
+  <div style="margin-bottom:32px;"><h1 style="font-size:28px;font-weight:800;margin-bottom:6px;">Dashboard</h1><p style="color:var(--text2);font-size:14px;">Verwalte deine Trades, Käufe und Verkäufe.</p></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:32px;">
+    <div class="stat-c"><div style="color:var(--text2);font-size:11px;font-weight:600;font-family:'Inter',sans-serif;margin-bottom:8px;">AKTIVE TRADES</div><div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;" id="sa">0</div></div>
+    <div class="stat-c"><div style="color:var(--text2);font-size:11px;font-weight:600;font-family:'Inter',sans-serif;margin-bottom:8px;">ABGESCHLOSSEN</div><div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;" id="sd">0</div></div>
+    <div class="stat-c"><div style="color:var(--text2);font-size:11px;font-weight:600;font-family:'Inter',sans-serif;margin-bottom:8px;">EINNAHMEN</div><div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;" id="sr">€0</div></div>
+    <div class="stat-c"><div style="color:var(--text2);font-size:11px;font-weight:600;font-family:'Inter',sans-serif;margin-bottom:8px;">MEINE ANGEBOTE</div><div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;" id="sl">0</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:24px;" id="db-grid">
+    <div>
+      <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;font-family:'Inter',sans-serif;color:var(--text2);">MEINE TRADES</h3>
+      <div id="tlist" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+    <div id="tdpanel">
+      <div class="card" style="padding:48px;border-radius:16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:300px;">
+        <div style="font-size:48px;">👈</div>
+        <p style="font-family:'Inter',sans-serif;font-weight:700;color:var(--text2);">Trade auswählen</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-reviews" class="page fu" style="max-width:900px;margin:0 auto;padding:48px 24px;">
+  <div style="margin-bottom:40px;text-align:center;">
+    <h1 style="font-size:32px;font-weight:800;margin-bottom:8px;">Was unsere Trader sagen</h1>
+    <p style="color:var(--text2);">Über 12.000 verifizierte Bewertungen von echten Nutzern</p>
+  </div>
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:40px;display:grid;grid-template-columns:180px 1fr;gap:40px;align-items:center;">
+    <div style="text-align:center;">
+      <div style="font-family:'Inter',sans-serif;font-size:72px;font-weight:800;line-height:1;color:var(--accent4);">4.97</div>
+      <div style="margin:8px 0;font-size:22px;letter-spacing:2px;color:var(--accent4);">★★★★★</div>
+      <div style="color:var(--text2);font-size:12px;">Basierend auf 12.483 Bewertungen</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;color:var(--text2);width:36px;flex-shrink:0;">5 ★</span><div class="pb" style="flex:1;"><div class="pf" style="width:91%;"></div></div><span style="font-size:12px;color:var(--text2);width:32px;text-align:right;">91%</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;color:var(--text2);width:36px;flex-shrink:0;">4 ★</span><div class="pb" style="flex:1;"><div class="pf" style="width:6%;"></div></div><span style="font-size:12px;color:var(--text2);width:32px;text-align:right;">6%</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;color:var(--text2);width:36px;flex-shrink:0;">3 ★</span><div class="pb" style="flex:1;"><div class="pf" style="width:2%;"></div></div><span style="font-size:12px;color:var(--text2);width:32px;text-align:right;">2%</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;color:var(--text2);width:36px;flex-shrink:0;">2 ★</span><div class="pb" style="flex:1;"><div class="pf" style="width:1%;"></div></div><span style="font-size:12px;color:var(--text2);width:32px;text-align:right;">1%</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;color:var(--text2);width:36px;flex-shrink:0;">1 ★</span><div class="pb" style="flex:1;"><div class="pf" style="width:0.5%;"></div></div><span style="font-size:12px;color:var(--text2);width:32px;text-align:right;">&lt;1%</span></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;margin-bottom:40px;" id="rgrid"></div>
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:28px;">
+    <h3 style="font-family:'Inter',sans-serif;font-size:17px;font-weight:700;margin-bottom:18px;">Bewertung hinterlassen</h3>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div><label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">DEIN NAME</label><input id="rn" type="text" placeholder="z.B. xX_SnipeKing_Xx" class="inp"></div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">STERNE</label>
+        <div id="spick" style="display:flex;gap:6px;font-size:26px;cursor:pointer;"></div>
+        <input id="rs" type="hidden" value="5">
+      </div>
+      <div><label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">BEWERTUNG</label><textarea id="rt" rows="3" placeholder="Deine Erfahrung…" class="inp" style="resize:vertical;"></textarea></div>
+      <button onclick="submitReview(event)" class="btn-p" style="width:100%;padding:12px;">Bewertung abschicken</button>
+    </div>
+  </div>
+</div>
+
+<div id="mitem" class="mo"><div class="mb"><div id="mitem-c"></div></div></div>
+<div id="mstripe" class="mo">
+  <div class="mb" style="max-width:460px;">
+    <div style="padding:28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+        <h3 style="font-family:'Inter',sans-serif;font-size:20px;font-weight:800;">Zahlung</h3>
+        <button onclick="cls('mstripe')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;color:var(--text2);font-size:16px;">✕</button>
+      </div>
+      <div id="stripe-sum" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:18px;"></div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px;">
+        <div><label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">KARTENINHABER</label><input type="text" placeholder="Max Mustermann" class="inp"></div>
+        <div><label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">KARTENNUMMER</label><input type="text" placeholder="4242 4242 4242 4242" class="inp" maxlength="19" oninput="fmtCard(this)"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">ABLAUF</label><input type="text" placeholder="MM/JJ" class="inp" maxlength="5"></div>
+          <div><label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Inter',sans-serif;">CVC</label><input type="text" placeholder="123" class="inp" maxlength="3"></div>
+        </div>
+      </div>
+      <div style="background:rgba(99,91,255,0.07);border:1px solid rgba(99,91,255,0.18);border-radius:12px;padding:12px;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2);">
+        <svg style="width:16px;height:16px;color:var(--stripe);flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        Gesichert durch <strong style="color:var(--stripe);">Stripe</strong>. Daten gehen direkt an Stripe, nie zu uns.
+      </div>
+      <button id="spbtn" onclick="processPayment()" class="btn-stripe" style="width:100%;padding:16px;font-size:15px;">
+        <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        Jetzt bezahlen
+      </button>
+      <p style="text-align:center;font-size:11px;color:var(--text2);margin-top:10px;">In Produktion: Weiterleitung zu stripe.com/checkout</p>
+    </div>
+  </div>
+</div>
+<div id="msucc" class="mo">
+  <div class="mb" style="max-width:400px;">
+    <div style="padding:48px;text-align:center;">
+      <div style="font-size:56px;margin-bottom:14px;">🎉</div>
+      <h3 style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;">Zahlung erfolgreich!</h3>
+      <p style="color:var(--text2);font-size:14px;margin-bottom:24px;">Trade wurde gestartet. Beide Parteien müssen jetzt bestätigen.</p>
+      <button onclick="cls('msucc');nav('dashboard');" class="btn-p" style="width:100%;padding:14px;">Zum Dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DB_KEY='ttdb_v2';
+const ME='CrazyJoe99';
+const EMOJIS=['🗡️','🛡️','💎','🔥','⭐','🎮','👑','🌀','🏆','💥','🎭','🦄','🐉','⚡','🎯','🍀','🌟','🎲','💰','🎁'];
+const COLS=['#7c6cfa','#fa6c9f','#6cfabc','#fac96c','#fa9b6c','#6cb4fa','#b76cfa'];
+const BOT=['Hey! Ja, das Item ist noch verfügbar 😊','Der Preis ist leider fix, aber Versand gratis!','Schick mir einfach den Trade-Link!','Alles klar auf meiner Seite ✅','Top, ich warte auf deine Anfrage! 🎮','Deal! Wann passt es dir?','Trade kann losgehen! 🚀','Perfekt, alles gecheckt ✔️'];
+const DEF_OFFERS=[
+  {id:'o1',title:'Butterfly Knife Fade FN',game:'CS2',category:'skins',price:399.99,seller:'KnifeMaster',emoji:'🗡️',color:'#7c6cfa',desc:'Factory New, kein Float-Schaden. Fade Pattern 94%.',rating:5,ts:Date.now()-3600000},
+  {id:'o2',title:'Dragon Lore AWP Field-Tested',game:'CS2',category:'skins',price:1249.99,seller:'xX_SnipeKing_Xx',emoji:'🐉',color:'#fa6c9f',desc:'Float 0.23, keine Sticker. Direkt gehandelt.',rating:5,ts:Date.now()-7200000},
+  {id:'o3',title:'10.000 V-Bucks',game:'Fortnite',category:'währungen',price:69.99,seller:'FortGod42',emoji:'💎',color:'#6cfabc',desc:'Sichere Lieferung via Code, sofort verfügbar.',rating:5,ts:Date.now()-1800000},
+  {id:'o4',title:'Valorant Immortal Acc',game:'Valorant',category:'accounts',price:129.00,seller:'ValoPro',emoji:'👑',color:'#fac96c',desc:'Immortal 2, alle Agenten, viele Skins.',rating:4,ts:Date.now()-5400000},
+  {id:'o5',title:'Rocket Pass Premium',game:'Rocket League',category:'boosts',price:12.49,seller:'BoostKing',emoji:'🚀',color:'#fa6c6c',desc:'Season Pass sofort aktivierbar.',rating:5,ts:Date.now()-900000},
+  {id:'o6',title:'AK-47 Asiimov WW',game:'CS2',category:'waffen',price:34.50,seller:'SkinFlip',emoji:'⚔️',color:'#fa9b6c',desc:'Well-Worn, Float 0.44.',rating:4,ts:Date.now()-10800000},
+  {id:'o7',title:'50.000 D4 Gold',game:'Diablo IV',category:'währungen',price:4.99,seller:'D4Trader',emoji:'🏆',color:'#6cb4fa',desc:'Serverübergabe, schnell & sicher.',rating:5,ts:Date.now()-600000},
+  {id:'o8',title:'OG Skull Trooper Acc',game:'Fortnite',category:'accounts',price:299.00,seller:'OGCollector',emoji:'🎭',color:'#b76cfa',desc:'OG Season 1 Account, sehr selten!',rating:5,ts:Date.now()-86400000},
+  {id:'o9',title:'Glock-18 Fade FN',game:'CS2',category:'waffen',price:189.00,seller:'FadeHunter',emoji:'🔫',color:'#fa6c9f',desc:'Full Fade, Factory New, Float 0.01.',rating:5,ts:Date.now()-2700000},
+  {id:'o10',title:'Win-Boost Silber→Gold',game:'Valorant',category:'boosts',price:19.99,seller:'BoostPro',emoji:'⚡',color:'#7c6cfa',desc:'Manueller Boost, 24h Lieferung.',rating:5,ts:Date.now()-4500000},
+];
+const DEF_TRADES=[
+  {id:'t1',offerId:'o1',title:'Butterfly Knife Fade FN',game:'CS2',price:399.99,seller:'KnifeMaster',buyer:ME,emoji:'🗡️',color:'#7c6cfa',status:'pending',sellerAccepted:false,buyerAccepted:true,paidAt:Date.now()-3600000,ts:Date.now()-3600000},
+  {id:'t2',offerId:'o3',title:'10.000 V-Bucks',game:'Fortnite',price:69.99,seller:'FortGod42',buyer:ME,emoji:'💎',color:'#6cfabc',status:'completed',sellerAccepted:true,buyerAccepted:true,paidAt:Date.now()-7200000,ts:Date.now()-7200000},
+];
+const DEF_REVIEWS=[
+  {id:'rv1',name:'xX_SnipeKing_Xx',stars:5,text:'Absolut top Plattform! Der Trade lief reibungslos, Zahlung sofort verarbeitet, Item innerhalb von Minuten erhalten. 100% weiterempfehlen!',date:'2025-03-12',verified:true,game:'CS2'},
+  {id:'rv2',name:'FortMaster99',stars:5,text:'Endlich ein Marktplatz, der wirklich sicher ist. Das beiderseitige Bestätigungssystem gibt mir als Käufer ein mega gutes Gefühl. Nie wieder woanders!',date:'2025-04-01',verified:true,game:'Fortnite'},
+  {id:'rv3',name:'LeagueTrader',stars:5,text:'Hatte auf anderen Plattformen schlechte Erfahrungen. Hier ist alles transparent. Der Chat mit dem Verkäufer hat super funktioniert!',date:'2025-04-18',verified:true,game:'LoL'},
+  {id:'rv4',name:'BoostQueen',stars:5,text:'Sehr übersichtliches Design, einfach zu bedienen. Der Stripe-Checkout ist vertrauenswürdig. Binnen 10 Minuten alles erledigt. ⭐⭐⭐⭐⭐',date:'2025-04-22',verified:true,game:'Valorant'},
+  {id:'rv5',name:'RocketPilot',stars:4,text:'Toller Service! Trade verlief schnell und unkompliziert. Kleiner Abzug weil die Mobile-Ansicht noch verbessert werden könnte. Insgesamt top!',date:'2025-05-03',verified:true,game:'Rocket League'},
+  {id:'rv6',name:'DiamondDave88',stars:5,text:'Zweiter Kauf hier und wieder perfekt. Der Verkäufer war sofort erreichbar, Trade in unter 5 Minuten abgeschlossen. Klare Weiterempfehlung!',date:'2025-05-10',verified:true,game:'CS2'},
+  {id:'rv7',name:'GoldTrader_EU',stars:5,text:'Super transparent, keine versteckten Gebühren. Der Käuferschutz hat mir bei meinem ersten Trade sehr viel Sicherheit gegeben. Gerne wieder!',date:'2025-05-14',verified:true,game:'Diablo IV'},
+  {id:'rv8',name:'NeonSkinz',stars:5,text:'Ich handle hier schon seit Monaten und hatte noch nie ein Problem. Support antwortet schnell und der Checkout-Prozess ist reibungslos.',date:'2025-05-15',verified:true,game:'CS2'},
+];
+
+function loadDB(){const r=localStorage.getItem(DB_KEY);if(!r){const d={offers:DEF_OFFERS,trades:DEF_TRADES,reviews:DEF_REVIEWS};saveDB(d);return d;}return JSON.parse(r);}
+function saveDB(d){localStorage.setItem(DB_KEY,JSON.stringify(d));}
+let DB=loadDB();
+let aCat='alle',aSort='newest',aQ='',curOffer=null,aTrade=null,chats={},selStars=5,aPg=1;
+
+function goPage(dir){aPg+=dir;renderOffers();document.getElementById('offers-sec').scrollIntoView({behavior:'smooth',block:'start'});}
+function setPage(p){aPg=p;renderOffers();document.getElementById('offers-sec').scrollIntoView({behavior:'smooth',block:'start'});}
+
+function nav(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nl').forEach(x=>x.classList.remove('active'));
+  const pg=document.getElementById('page-'+p);
+  if(pg){pg.classList.add('active');pg.classList.remove('fu');void pg.offsetWidth;pg.classList.add('fu');}
+  const nb=document.getElementById('nav-'+p);if(nb)nb.classList.add('active');
+  if(p==='marketplace'){renderOffers();renderMktReviews();initMktStarPicker();}
+  if(p==='dashboard')renderDB();
+  if(p==='reviews')renderReviews();
+  if(p==='create')resetForm();
+}
+
+function cCol(c){const m={skins:'#fa6c9f',währungen:'#6cfabc',accounts:'#b76cfa',waffen:'#fa9b6c',boosts:'#6cb4fa'};return m[c]||'#7c6cfa';}
+function cLbl(c){const m={skins:'Skin',währungen:'Währung',accounts:'Account',waffen:'Waffe',boosts:'Boost'};return m[c]||c;}
+
+function renderOffers(){
+  let items=[...DB.offers];
+  if(aCat!=='alle')items=items.filter(o=>o.category===aCat);
+  if(aQ)items=items.filter(o=>[o.title,o.game,o.seller].join(' ').toLowerCase().includes(aQ));
+  if(aSort==='newest')items.sort((a,b)=>b.ts-a.ts);
+  else if(aSort==='pa')items.sort((a,b)=>a.price-b.price);
+  else if(aSort==='pd')items.sort((a,b)=>b.price-a.price);
+  else if(aSort==='rating')items.sort((a,b)=>b.rating-a.rating);
+  const PER=8;
+  const totalPages=Math.max(1,Math.ceil(items.length/PER));
+  if(aPg>totalPages)aPg=totalPages;
+  const paged=items.slice((aPg-1)*PER,aPg*PER);
+  const grid=document.getElementById('offers-grid');
+  const nr=document.getElementById('no-res');
+  const pgBar=document.getElementById('pagination');
+  document.getElementById('olabel').textContent=`${items.length} Angebot${items.length!==1?'e':''}`;
+  if(!items.length){grid.innerHTML='';nr.style.display='block';pgBar.style.display='none';return;}
+  nr.style.display='none';
+  grid.innerHTML=paged.map((o,i)=>`
+    <div class="card" style="border-radius:16px;overflow:hidden;cursor:pointer;animation:fadeUp 0.35s ease ${i*0.04}s both;" onclick="openItemM('${o.id}')">
+      <div style="height:130px;display:flex;align-items:center;justify-content:center;font-size:52px;background:linear-gradient(135deg,${o.color}1a,${o.color}33);border-bottom:1px solid var(--border);">${o.emoji}</div>
+      <div style="padding:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span class="tag" style="background:${cCol(o.category)}18;color:${cCol(o.category)};border:1px solid ${cCol(o.category)}33;">${cLbl(o.category)}</span>
+          <span style="color:var(--accent4);font-size:12px;">${'★'.repeat(o.rating)}${'☆'.repeat(5-o.rating)}</span>
+        </div>
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${o.title}</h3>
+        <p style="color:var(--text2);font-size:12px;margin-bottom:12px;">${o.game}</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <span style="font-size:20px;font-weight:800;">€${Number(o.price).toFixed(2)}</span>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div style="width:18px;height:18px;border-radius:5px;background:${o.color};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;">${o.seller.slice(0,2).toUpperCase()}</div>
+            <span style="color:var(--text2);font-size:11px;overflow:hidden;max-width:80px;white-space:nowrap;text-overflow:ellipsis;">${o.seller}</span>
+          </div>
+        </div>
+        <button onclick="event.stopPropagation();openItemM('${o.id}');" class="btn-p" style="width:100%;padding:9px;font-size:13px;">Ansehen →</button>
+      </div>
+    </div>
+  `).join('');
+  if(totalPages<=1){pgBar.style.display='none';return;}
+  pgBar.style.display='flex';
+  document.getElementById('pg-prev').disabled=aPg===1;
+  document.getElementById('pg-prev').style.opacity=aPg===1?'0.4':'1';
+  document.getElementById('pg-next').disabled=aPg===totalPages;
+  document.getElementById('pg-next').style.opacity=aPg===totalPages?'0.4':'1';
+  const nums=document.getElementById('pg-numbers');
+  let pages=[];
+  for(let i=1;i<=totalPages;i++){
+    if(i===1||i===totalPages||Math.abs(i-aPg)<=1)pages.push(i);
+    else if(Math.abs(i-aPg)===2)pages.push('…');
+  }
+  pages=[...new Set(pages)];
+  nums.innerHTML=pages.map(p=>p==='…'
+    ?`<span style="padding:8px 4px;color:var(--text2);font-size:14px;">…</span>`
+    :`<button onclick="setPage(${p})" style="width:36px;height:36px;border-radius:8px;border:1px solid ${p===aPg?'var(--accent)':'var(--border)'};background:${p===aPg?'var(--accent)':'var(--surface2)'};color:${p===aPg?'#fff':'var(--text)'};font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;">${p}</button>`
+  ).join('');
+}
+
+function filterCat(c,el){aCat=c;aPg=1;document.querySelectorAll('.cp').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');renderOffers();}
+function doSort(v){aSort=v;aPg=1;renderOffers();}
+function doSearch(v){aQ=v.toLowerCase();aPg=1;renderOffers();}
+
+function openItemM(id){
+  const o=DB.offers.find(x=>x.id===id);if(!o)return;curOffer=o;
+  document.getElementById('mitem-c').innerHTML=`
+    <div>
+      <div style="height:180px;display:flex;align-items:center;justify-content:center;font-size:72px;background:linear-gradient(135deg,${o.color}18,${o.color}33);border-radius:20px 20px 0 0;border-bottom:1px solid var(--border);">${o.emoji}</div>
+      <div style="padding:24px;">
+        <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:14px;">
+          <div>
+            <span class="tag" style="background:${cCol(o.category)}18;color:${cCol(o.category)};border:1px solid ${cCol(o.category)}33;margin-bottom:8px;">${cLbl(o.category)}</span>
+            <h2 style="font-family:'Inter',sans-serif;font-size:21px;font-weight:800;margin-top:6px;">${o.title}</h2>
+            <p style="color:var(--text2);font-size:13px;">🎮 ${o.game}</p>
+          </div>
+          <button onclick="cls('mitem')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;color:var(--text2);font-size:16px;flex-shrink:0;margin-left:12px;">✕</button>
+        </div>
+        <p style="color:var(--text2);font-size:13px;margin-bottom:18px;line-height:1.6;">${o.desc||'Keine Beschreibung.'}</p>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+          <div style="width:38px;height:38px;border-radius:10px;background:${o.color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;font-family:'Inter',sans-serif;color:#fff;">${o.seller.slice(0,2).toUpperCase()}</div>
+          <div>
+            <p style="font-weight:700;font-family:'Inter',sans-serif;">${o.seller}</p>
+            <div style="color:var(--accent4);font-size:12px;">★★★★★ <span style="color:var(--text2);">Verifizierter Trader</span></div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:4px;"><span class="bdot"></span><span style="font-size:12px;color:var(--accent3);">Online</span></div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;">
+          <div><p style="color:var(--text2);font-size:11px;font-family:'Inter',sans-serif;font-weight:600;">PREIS</p><p style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;">€${Number(o.price).toFixed(2)}</p><p style="color:var(--text2);font-size:11px;">inkl. Käuferschutz</p></div>
+          <div style="text-align:right;"><p style="color:var(--text2);font-size:11px;">Plattformgebühr</p><p style="font-weight:700;color:var(--accent3);">✓ Inkludiert</p></div>
+        </div>
+        <div style="background:rgba(108,250,188,0.04);border:1px solid rgba(108,250,188,0.14);border-radius:12px;padding:14px;margin-bottom:18px;">
+          <p style="font-size:12px;font-weight:700;font-family:'Inter',sans-serif;color:var(--accent3);margin-bottom:8px;">🤝 Wie läuft der Trade?</p>
+          <div style="font-size:12px;color:var(--text2);display:flex;flex-direction:column;gap:4px;"><div>1. Du zahlst sicher über Stripe</div><div>2. Beide Seiten bestätigen den Trade</div><div>3. Item wird übergeben → Abgeschlossen</div></div>
+        </div>
+        <button onclick="openStripe('${o.id}')" class="btn-stripe" style="width:100%;padding:15px;font-size:15px;">
+          <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+          Kaufen · €${Number(o.price).toFixed(2)}
+        </button>
+      </div>
+    </div>
+  `;
+  document.getElementById('mitem').classList.add('open');
+}
+
+function openStripe(id){
+  const o=DB.offers.find(x=>x.id===id);if(!o)return;curOffer=o;
+  cls('mitem');
+  document.getElementById('stripe-sum').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:26px;">${o.emoji}</div>
+      <div style="flex:1;"><p style="font-weight:700;font-family:'Inter',sans-serif;font-size:14px;">${o.title}</p><p style="color:var(--text2);font-size:12px;">${o.game} · ${o.seller}</p></div>
+      <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;">€${Number(o.price).toFixed(2)}</div>
+    </div>
+    <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-size:12px;color:var(--text2);">
+      <span>Plattformgebühr (2%)</span><span>€${(o.price*0.02).toFixed(2)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;margin-top:8px;">
+      <span>Gesamt</span><span>€${(o.price*1.02).toFixed(2)}</span>
+    </div>
+  `;
+  const btn=document.getElementById('spbtn');
+  btn.innerHTML=`<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg> Jetzt bezahlen · €${(o.price*1.02).toFixed(2)}`;
+  btn.disabled=false;
+  document.getElementById('mstripe').classList.add('open');
+}
+
+function processPayment(){
+  if(!curOffer)return;
+  const btn=document.getElementById('spbtn');
+  btn.disabled=true;
+  btn.innerHTML=`<div style="width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;"></div> Verarbeite…`;
+  setTimeout(()=>{
+    const t={id:'t'+Date.now(),offerId:curOffer.id,title:curOffer.title,game:curOffer.game,price:curOffer.price,seller:curOffer.seller,buyer:ME,emoji:curOffer.emoji,color:curOffer.color,status:'paid',sellerAccepted:false,buyerAccepted:true,paidAt:Date.now(),ts:Date.now()};
+    DB.trades.push(t);saveDB(DB);
+    document.getElementById('ndot').style.display='block';
+    cls('mstripe');document.getElementById('msucc').classList.add('open');
+    btn.disabled=false;
+    btn.innerHTML=`<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg> Jetzt bezahlen`;
+  },2200);
+}
+
+function fmtCard(inp){let v=inp.value.replace(/\D/g,'').slice(0,16);inp.value=v.replace(/(.{4})/g,'$1 ').trim();}
+function cls(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+
+function tsc(t){if(t.status==='completed')return'#6cfabc';if(!t.sellerAccepted||!t.buyerAccepted)return'#fac96c';return'#7c6cfa';}
+function tsl(t){if(t.status==='completed')return'Abgeschlossen';if(!t.sellerAccepted)return'Warte auf Händler';if(!t.buyerAccepted)return'Warte auf Käufer';return'Aktiv';}
+
+function renderDB(){
+  const my=DB.trades.filter(t=>t.buyer===ME||t.seller===ME);
+  const active=my.filter(t=>t.status!=='completed').length;
+  const done=my.filter(t=>t.status==='completed').length;
+  const rev=my.filter(t=>t.seller===ME&&t.status==='completed').reduce((s,t)=>s+t.price,0);
+  const listings=DB.offers.filter(o=>o.seller===ME).length;
+  document.getElementById('sa').textContent=active;
+  document.getElementById('sd').textContent=done;
+  document.getElementById('sr').textContent='€'+rev.toFixed(0);
+  document.getElementById('sl').textContent=listings;
+  if(my.some(t=>!t.sellerAccepted||!t.buyerAccepted))document.getElementById('ndot').style.display='block';
+  const tlist=document.getElementById('tlist');
+  if(!my.length){tlist.innerHTML=`<div style="color:var(--text2);font-size:13px;padding:20px;text-align:center;">Noch keine Trades.<br><br><button class="btn-p" onclick="nav('marketplace')" style="padding:10px 18px;font-size:13px;margin-top:8px;">Zum Marktplatz →</button></div>`;return;}
+  tlist.innerHTML=my.map(t=>`
+    <div onclick="selTrade('${t.id}')" id="tc${t.id}" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;border-radius:9px;background:${t.color}22;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${t.emoji}</div>
+        <div style="flex:1;min-width:0;">
+          <p style="font-family:'Inter',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.title}</p>
+          <p style="color:var(--text2);font-size:11px;">${t.game} · ${t.buyer===ME?'Kauf':'Verkauf'}</p>
+        </div>
+        <span class="tag" style="background:${tsc(t)}18;color:${tsc(t)};border:1px solid ${tsc(t)}33;font-size:10px;">${tsl(t)}</span>
+      </div>
+      ${(!t.sellerAccepted||!t.buyerAccepted)&&t.status!=='completed'?`<div style="background:rgba(250,201,108,0.08);border:1px solid rgba(250,201,108,0.22);border-radius:8px;padding:7px 10px;margin-top:8px;font-size:11px;color:var(--accent4);font-weight:600;">⏳ ${!t.sellerAccepted?'Wartet auf Händler':'Wartet auf Käufer'}</div>`:''}
+    </div>
+  `).join('');
+}
+
+function selTrade(id){
+  const t=DB.trades.find(x=>x.id===id);if(!t)return;aTrade=t;
+  document.querySelectorAll('[id^="tc"]').forEach(el=>el.style.borderColor='var(--border)');
+  const card=document.getElementById('tc'+id);if(card)card.style.borderColor='var(--accent)';
+  if(!chats[id])chats[id]=[{from:'bot',text:`Hey! Ich bin ${t.seller}. Bereit für den Trade? 😊`,ts:Date.now()}];
+  const isBuyer=t.buyer===ME;
+  document.getElementById('tdpanel').innerHTML=`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+      <div style="padding:18px 22px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;">
+        <div><h3 style="font-family:'Inter',sans-serif;font-size:16px;font-weight:800;">${t.emoji} ${t.title}</h3><p style="color:var(--text2);font-size:12px;margin-top:2px;">${t.game} · €${Number(t.price).toFixed(2)} · ${isBuyer?'Du bist Käufer':'Du bist Verkäufer'}</p></div>
+        <span class="tag" style="background:${tsc(t)}18;color:${tsc(t)};border:1px solid ${tsc(t)}33;">${tsl(t)}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+        <div style="padding:22px;border-right:1px solid var(--border);">
+          <h4 style="font-family:'Inter',sans-serif;font-size:12px;font-weight:700;margin-bottom:14px;color:var(--text2);letter-spacing:0.5px;">TRADE-FORTSCHRITT</h4>
+          <div class="ts"><div class="sn done">✓</div><div><p style="font-weight:700;font-size:13px;">Zahlung erhalten</p><p style="color:var(--text2);font-size:11px;">${t.paidAt?new Date(t.paidAt).toLocaleString('de-DE'):'—'}</p></div></div>
+          <div class="ts"><div class="sn ${t.sellerAccepted?'done':'pend'}">${t.sellerAccepted?'✓':'2'}</div><div style="flex:1;"><p style="font-weight:700;font-size:13px;">Händler bestätigt</p><p style="color:${t.sellerAccepted?'var(--accent3)':'var(--text2)'};font-size:11px;">${t.sellerAccepted?'Bestätigt ✓':'Muss zuerst bestätigen'}</p></div></div>
+          <div class="ts"><div class="sn ${t.buyerAccepted?'done':(t.sellerAccepted?'pend':'pend')}">${t.buyerAccepted?'✓':'3'}</div><div style="flex:1;"><p style="font-weight:700;font-size:13px;">Käufer bestätigt</p><p style="color:${t.buyerAccepted?'var(--accent3)':(t.sellerAccepted?'var(--text2)':'var(--text2)')};font-size:11px;">${t.buyerAccepted?'Bestätigt ✓':(t.sellerAccepted?'Ausstehend':'Wartet auf Händler')}</p></div></div>
+          <div class="ts"><div class="sn ${t.status==='completed'?'done':'pend'}">${t.status==='completed'?'✓':'4'}</div><div><p style="font-weight:700;font-size:13px;">Item übergeben</p><p style="color:var(--text2);font-size:11px;">${t.status==='completed'?'Abgeschlossen ✓':'Warte auf beide'}</p></div></div>
+          <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+            ${t.status!=='completed'?`
+              ${!isBuyer&&!t.sellerAccepted?`<button onclick="acceptT('${id}','seller')" class="btn-success" style="width:100%;padding:11px;font-size:13px;">✓ Als Händler bestätigen</button>`:''}
+              ${!isBuyer&&t.sellerAccepted?`<div style="background:rgba(108,250,188,0.08);border:1px solid rgba(108,250,188,0.2);border-radius:8px;padding:10px;font-size:12px;color:var(--accent3);font-weight:600;text-align:center;">✓ Du hast bestätigt · Warte auf Käufer</div>`:''}
+              ${isBuyer&&!t.sellerAccepted?`<div style="background:rgba(250,201,108,0.08);border:1px solid rgba(250,201,108,0.22);border-radius:8px;padding:10px;font-size:12px;color:var(--accent4);font-weight:600;text-align:center;">⏳ Händler muss zuerst bestätigen</div>`:''}
+              ${isBuyer&&t.sellerAccepted&&!t.buyerAccepted?`<button onclick="acceptT('${id}','buyer')" class="btn-success" style="width:100%;padding:11px;font-size:13px;">✓ Als Käufer bestätigen</button>`:''}
+              ${isBuyer&&t.buyerAccepted?`<div style="background:rgba(108,250,188,0.08);border:1px solid rgba(108,250,188,0.2);border-radius:8px;padding:10px;font-size:12px;color:var(--accent3);font-weight:600;text-align:center;">✓ Du hast bestätigt · Warte auf Abschluss</div>`:''}
+              ${t.sellerAccepted&&t.buyerAccepted?`<button onclick="completeT('${id}')" class="btn-p" style="width:100%;padding:11px;font-size:13px;">🏁 Trade abschließen</button>`:''}
+              <button onclick="alert('⚠️ Dispute geöffnet. Team prüft den Fall.')" class="btn-danger" style="width:100%;padding:9px;font-size:12px;">⚠️ Dispute eröffnen</button>
+            `:`<div style="background:rgba(108,250,188,0.08);border:1px solid rgba(108,250,188,0.18);border-radius:12px;padding:14px;text-align:center;"><div style="font-size:22px;margin-bottom:4px;">🎉</div><p style="font-weight:700;color:var(--accent3);font-size:13px;">Trade erfolgreich!</p></div>`}
+          </div>
+        </div>
+        <div style="padding:22px;display:flex;flex-direction:column;">
+          <h4 style="font-family:'Inter',sans-serif;font-size:12px;font-weight:700;margin-bottom:14px;color:var(--text2);letter-spacing:0.5px;">LIVE-CHAT MIT ${t.seller.toUpperCase()}</h4>
+          <div id="chat${id}" style="flex:1;min-height:180px;max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:12px;" class="sh"></div>
+          <div style="display:flex;gap:8px;">
+            <input id="ci${id}" type="text" placeholder="Nachricht…" class="inp" style="flex:1;padding:10px 14px;font-size:13px;" onkeydown="if(event.key==='Enter')sendMsg('${id}')">
+            <button onclick="sendMsg('${id}')" class="btn-p" style="padding:10px 14px;flex-shrink:0;">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  renderChat(id);
+}
+
+function renderChat(id){
+  const c=document.getElementById('chat'+id);if(!c)return;
+  c.innerHTML=(chats[id]||[]).map(m=>`<div style="display:flex;${m.from==='user'?'justify-content:flex-end;':''}"><div class="${m.from==='user'?'cm-u':'cm-b'}">${m.text}</div></div>`).join('');
+  c.scrollTop=c.scrollHeight;
+}
+
+function sendMsg(id){
+  const inp=document.getElementById('ci'+id);const text=inp.value.trim();if(!text)return;
+  if(!chats[id])chats[id]=[];
+  chats[id].push({from:'user',text,ts:Date.now()});inp.value='';renderChat(id);
+  setTimeout(()=>{chats[id].push({from:'bot',text:BOT[Math.floor(Math.random()*BOT.length)],ts:Date.now()});renderChat(id);},1200+Math.random()*1400);
+}
+
+function acceptT(id,role){
+  const t=DB.trades.find(x=>x.id===id);if(!t)return;
+  if(role==='buyer')t.buyerAccepted=true;
+  if(role==='seller')t.sellerAccepted=true;
+  saveDB(DB);renderDB();selTrade(id);
+}
+
+function completeT(id){
+  const t=DB.trades.find(x=>x.id===id);if(!t)return;
+  t.status='completed';t.sellerAccepted=true;t.buyerAccepted=true;
+  saveDB(DB);renderDB();selTrade(id);
+}
+
+function renderReviews(){
+  document.getElementById('rgrid').innerHTML=DB.reviews.map((r,i)=>reviewCard(r,i)).join('');
+}
+
+function renderMktReviews(){
+  const el=document.getElementById('mkt-rgrid');if(!el)return;
+  el.innerHTML=DB.reviews.slice(0,6).map((r,i)=>reviewCard(r,i)).join('');
+}
+
+function reviewCard(r,i){
+  return`<div class="rc" style="animation:fadeUp 0.4s ease ${i*0.06}s both;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;">${r.name.slice(0,2).toUpperCase()}</div>
+        <div><p style="font-weight:700;font-size:13px;">${r.name}</p><p style="color:var(--text2);font-size:11px;">${r.game||'Trader'} · ${r.date}</p></div>
+      </div>
+      ${r.verified?`<span class="tag" style="background:rgba(108,250,188,0.08);color:var(--accent3);border:1px solid rgba(108,250,188,0.18);font-size:10px;">✓ Verifiziert</span>`:''}
+    </div>
+    <div style="color:var(--accent4);font-size:14px;margin-bottom:8px;letter-spacing:1px;">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+    <p style="color:var(--text2);font-size:13px;line-height:1.6;">${r.text}</p>
+  </div>`;
+}
+
+function pickStar(v){
+  selStars=v;document.getElementById('rs').value=v;
+  document.querySelectorAll('#spick span').forEach((s,i)=>{s.textContent=i<v?'★':'☆';s.style.color=i<v?'var(--accent4)':'var(--text2)';});
+}
+
+function submitMktReview(ev){
+  const name=document.getElementById('mrn').value.trim();
+  const text=document.getElementById('mrt').value.trim();
+  const stars=parseInt(document.getElementById('mrs').value);
+  if(!name||!text){alert('Bitte Name und Text ausfüllen.');return;}
+  DB.reviews.unshift({id:'rv'+Date.now(),name,stars,text,date:new Date().toISOString().slice(0,10),verified:false,game:'ToonTrade'});
+  saveDB(DB);
+  document.getElementById('mrn').value='';document.getElementById('mrt').value='';pickMktStar(5);
+  renderMktReviews();renderReviews();
+  const btn=ev.target;btn.textContent='✓ Gespeichert!';btn.style.background='var(--accent3)';
+  setTimeout(()=>{btn.textContent='Bewertung abschicken';btn.style.background='';},2000);
+}
+
+function pickMktStar(v){
+  document.getElementById('mrs').value=v;
+  document.querySelectorAll('#mspick span').forEach((s,i)=>{s.textContent=i<v?'★':'☆';s.style.color=i<v?'var(--accent4)':'var(--text2)';});
+}
+
+function initMktStarPicker(){
+  const c=document.getElementById('mspick');if(!c)return;
+  c.innerHTML='12345'.split('').map((_,i)=>`<span onclick="pickMktStar(${i+1})" style="cursor:pointer;color:var(--accent4);">★</span>`).join('');
+}
+
+function submitReview(ev){
+  const name=document.getElementById('rn').value.trim();
+  const text=document.getElementById('rt').value.trim();
+  const stars=parseInt(document.getElementById('rs').value);
+  if(!name||!text){alert('Bitte Name und Text ausfüllen.');return;}
+  DB.reviews.unshift({id:'rv'+Date.now(),name,stars,text,date:new Date().toISOString().slice(0,10),verified:false,game:'ToonTrade'});
+  saveDB(DB);
+  document.getElementById('rn').value='';document.getElementById('rt').value='';pickStar(5);
+  renderReviews();renderMktReviews();
+  const btn=ev.target;btn.textContent='✓ Gespeichert!';btn.style.background='var(--accent3)';
+  setTimeout(()=>{btn.textContent='Bewertung abschicken';btn.style.background='';},2000);
+}
+
+function setupEmojiPicker(){
+  const c=document.getElementById('epick');if(!c)return;
+  c.innerHTML=EMOJIS.map(e=>`<span style="font-size:22px;cursor:pointer;padding:4px 5px;border-radius:6px;transition:background 0.15s;" onclick="pickEmoji('${e}',this)">${e}</span>`).join('');
+}
+
+function pickEmoji(e,el){
+  document.getElementById('fe').value=e;
+  document.querySelectorAll('#epick span').forEach(s=>s.style.background='');
+  el.style.background='var(--accent)33';
+}
+
+function submitOffer(){
+  const title=document.getElementById('ft').value.trim();
+  const game=document.getElementById('fg').value;
+  const cat=document.getElementById('fc').value;
+  const price=parseFloat(document.getElementById('fp').value);
+  const desc=document.getElementById('fd').value.trim();
+  const emoji=document.getElementById('fe').value||'🎮';
+  let ok=true;
+  [['ft','et',title],['fg','eg',game],['fc','ec',cat]].forEach(([,err,val])=>{
+    document.getElementById(err).style.display=val?'none':'block';if(!val)ok=false;
+  });
+  document.getElementById('ep').style.display=(!isNaN(price)&&price>0)?'none':'block';
+  if(isNaN(price)||price<=0)ok=false;
+  if(!ok)return;
+  const o={id:'o'+Date.now(),title,game,category:cat,price,seller:ME,emoji,color:COLS[Math.floor(Math.random()*COLS.length)],desc,rating:5,ts:Date.now()};
+  DB.offers.unshift(o);saveDB(DB);
+  document.getElementById('c-succ').style.display='block';
+  setTimeout(()=>{document.getElementById('c-succ').style.display='none';nav('marketplace');},1800);
+}
+
+function resetForm(){
+  ['ft','fd','fp'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['fg','fc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['et','eg','ec','ep'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  const s=document.getElementById('c-succ');if(s)s.style.display='none';
+  const fe=document.getElementById('fe');if(fe)fe.value='🎮';
+  setupEmojiPicker();
+}
+
+function initStarPicker(){
+  const c=document.getElementById('spick');if(!c)return;
+  c.innerHTML='12345'.split('').map((_,i)=>`<span data-v="${i+1}" onclick="pickStar(${i+1})" style="cursor:pointer;color:var(--accent4);">★</span>`).join('');
+}
+
+renderOffers();
+initStarPicker();
+renderReviews();
+renderMktReviews();
+initMktStarPicker();
+</script>
+</body>
+</html>
